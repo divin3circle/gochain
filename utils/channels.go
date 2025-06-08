@@ -12,6 +12,7 @@ func calculateSquares(number int, squareStream chan int) {
 		number /= 10
 	}
 	squareStream <- sum
+	close(squareStream)
 }
 
 func calculateCubes(number int, cubesStream chan int) {
@@ -23,18 +24,30 @@ func calculateCubes(number int, cubesStream chan int) {
 		number /= 10
 	}
 	cubesStream <- sum
+	close(cubesStream)
 }
 
 func main() {
-	number := 12345
+	number := 589
 	squaresChannel := make(chan int)
 	cubesChannel := make(chan int)
 
 	go calculateCubes(number, cubesChannel)
 	go calculateSquares(number, squaresChannel)
 
-	squares, cubes := <-squaresChannel, <-cubesChannel
-	fmt.Println("Squares:", squares)
-	fmt.Println("Cubes:", cubes)
-	fmt.Println("Sum:", squares+cubes)
+	for {
+		sq, ok := <-squaresChannel
+		if !ok {
+			break
+		}
+		cu, ok := <-cubesChannel
+		if !ok {
+			break
+		}
+		fmt.Println("Squares:", sq)
+		fmt.Println("Cubes:", cu)
+		fmt.Println("Sum:", sq+cu)
+	}
+
+	
 }
