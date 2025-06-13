@@ -3,11 +3,12 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"io"
 	"log"
 	"net"
 	"os"
 	"time"
-
+	"bufio"
 	"fmt"
 
 	"github.com/davecgh/go-spew/spew"
@@ -73,7 +74,7 @@ func replaceChain(newBlocks []Block) {
 	}
 }
 
-func handleConn(conn net.Conn) {
+func HandleConn(conn net.Conn) {
 	defer conn.Close()
 }
 
@@ -109,7 +110,15 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		go handleConn(conn)
+		go HandleConn(conn)
 	}
+
+	io.WriteString(conn, "Enter a new BPM:")
+	scanner := bufio.NewScanner(conn)
+	go func() {
+		for scanner.Scan() {
+			bpm, err := strconv.Atoi(scanner.Text())
+		}
+	}()
 
 }
